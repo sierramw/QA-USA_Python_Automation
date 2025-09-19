@@ -4,40 +4,40 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 class UrbanRoutes:
+    # --- Address fields ---
+    FROM_FIELD = (By.ID, "from")
+    TO_FIELD = (By.ID, "to")
+    CALL_TAXI_BTN = (By.CLASS_NAME, "button")
+
+    # --- Tariff selection ---
+    SUPPORTIVE_TARIFF = (By.XPATH, "//div[contains(text(),'Supportive')]")
+
+    # --- Phone number flow ---
+    PHONE_FIELD = (By.CSS_SELECTOR, "input#phone")
+    NEXT_BTN = (By.XPATH, "//button[text()='Next']")
+    SMS_CODE_INPUT = (By.CSS_SELECTOR, "input#code")
+    CONFIRM_PHONE_BTN = (By.XPATH, "//button[text()='Confirm']")
+
+    # --- Card payment flow ---
+    PAYMENT_METHOD_BTN = (By.XPATH, "//div[contains(@class,'pp-button')]")
+    ADD_CARD_BTN = (By.XPATH, "//div[contains(text(),'Add card')]")
+    CARD_NUMBER_INPUT = (By.CSS_SELECTOR, "input#number")
+    CVV_INPUT = (By.CSS_SELECTOR, "input#code")
+    LINK_CARD_BTN = (By.XPATH, "//button[text()='Link']")
+    CARD_CONFIRMATION = (By.XPATH, "//div[contains(text(),'Card')]")
+
+    # --- Comment & extras ---
+    COMMENT_FIELD = (By.ID, "comment")
+    BLANKET_CHECKBOX = (By.NAME, "blanket")
+    ICECREAM_ADD_BTN = (By.XPATH, "//button[contains(.,'Ice cream')]")
+
+    # --- Final order ---
+    ORDER_BTN = (By.XPATH, "//button[text()='Call a Taxi']")
+    CAR_SEARCH_MODAL = (By.CLASS_NAME, "order-modal")
+
     def __init__(self, driver, timeout=10):
         self.driver = driver
         self.wait = WebDriverWait(driver, timeout)
-
-        # --- Address fields ---
-        self.FROM_FIELD = (By.ID, "from")
-        self.TO_FIELD = (By.ID, "to")
-        self.CALL_TAXI_BTN = (By.CLASS_NAME, "button")
-
-        # --- Tariff selection ---
-        self.SUPPORTIVE_TARIFF = (By.XPATH, "//div[contains(text(),'Supportive')]")
-
-        # --- Phone number flow ---
-        self.PHONE_FIELD = (By.CSS_SELECTOR, "input#phone")
-        self.NEXT_BTN = (By.XPATH, "//button[text()='Next']")
-        self.SMS_CODE_INPUT = (By.CSS_SELECTOR, "input#code")
-        self.CONFIRM_PHONE_BTN = (By.XPATH, "//button[text()='Confirm']")
-
-        # --- Card payment flow ---
-        self.PAYMENT_METHOD_BTN = (By.XPATH, "//div[contains(@class,'pp-button')]")
-        self.ADD_CARD_BTN = (By.XPATH, "//div[contains(text(),'Add card')]")
-        self.CARD_NUMBER_INPUT = (By.CSS_SELECTOR, "input#number")
-        self.CVV_INPUT = (By.CSS_SELECTOR, "input#code")
-        self.LINK_CARD_BTN = (By.XPATH, "//button[text()='Link']")
-        self.CARD_CONFIRMATION = (By.XPATH, "//div[contains(text(),'Card')]")
-
-        # --- Comment & extras ---
-        self.COMMENT_FIELD = (By.ID, "comment")
-        self.BLANKET_CHECKBOX = (By.NAME, "blanket")
-        self.ICECREAM_ADD_BTN = (By.XPATH, "//button[contains(.,'Ice cream')]")
-
-        # --- Final order ---
-        self.ORDER_BTN = (By.XPATH, "//button[text()='Call a Taxi']")
-        self.CAR_SEARCH_MODAL = (By.CLASS_NAME, "order-modal")
 
     # --- Step 1: Set address ---
     def set_address(self, from_address, to_address):
@@ -49,12 +49,18 @@ class UrbanRoutes:
         to_field.clear()
         to_field.send_keys(to_address)
 
-    def click_call_taxi(self):
-        self.wait.until(EC.element_to_be_clickable(self.CALL_TAXI_BTN)).click()
+    def get_from_value(self):
+        return self.driver.find_element(*self.FROM_FIELD).get_attribute("value")
+
+    def get_to_value(self):
+        return self.driver.find_element(*self.TO_FIELD).get_attribute("value")
 
     # --- Step 2: Select tariff ---
     def select_supportive_plan(self):
         self.wait.until(EC.element_to_be_clickable(self.SUPPORTIVE_TARIFF)).click()
+
+    def get_selected_plan_text(self):
+        return self.driver.find_element(*self.SUPPORTIVE_TARIFF).text
 
     # --- Step 3: Phone number flow ---
     def enter_phone_and_confirm(self, phone, code_callback):
@@ -68,6 +74,9 @@ class UrbanRoutes:
         sms_field = self.wait.until(EC.element_to_be_clickable(self.SMS_CODE_INPUT))
         sms_field.send_keys(code)
         self.driver.find_element(*self.CONFIRM_PHONE_BTN).click()
+
+    def get_entered_phone_number(self):
+        return self.driver.find_element(*self.PHONE_FIELD).get_attribute("value")
 
     # --- Step 4: Card payment flow ---
     def open_payment_and_add_card(self, card_number, cvv):
@@ -94,9 +103,15 @@ class UrbanRoutes:
         field.clear()
         field.send_keys(message)
 
+    def get_comment_text(self):
+        return self.driver.find_element(*self.COMMENT_FIELD).get_attribute("value")
+
     # --- Step 6: Toggle blanket ---
     def toggle_blanket(self):
         self.wait.until(EC.element_to_be_clickable(self.BLANKET_CHECKBOX)).click()
+
+    def is_blanket_selected(self):
+        return self.driver.find_element(*self.BLANKET_CHECKBOX).is_selected()
 
     # --- Step 7: Add ice creams ---
     def add_icecreams(self, count=2):
