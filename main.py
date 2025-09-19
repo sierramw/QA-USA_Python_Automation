@@ -14,7 +14,7 @@ class TestUrbanRoutes:
         cls.driver = webdriver.Chrome()
 
         # Step 2: Check URL reachability only
-        if helpers.is_url_reachable('https://cnt-e66d181f-f389-48e7-aebe-6a802c148cd4.containerhub.tripleten-services.com/'):
+        if helpers.is_url_reachable('https://cnt-ea585d14-6ded-4abe-b0aa-2c6ed5c9972c.containerhub.tripleten-services.com/'):
             print("Connected to the Urban Routes server")
         else:
             print("Cannot connect to Urban Routes. Check the server is on and still running")
