@@ -1,4 +1,4 @@
-URBAN_ROUTES_URL = 'https://cnt-ea585d14-6ded-4abe-b0aa-2c6ed5c9972c.containerhub.tripleten-services.com/'
+URBAN_ROUTES_URL = 'https://cnt-2e571daa-2843-4764-9a15-0cce6ec7cab1.containerhub.tripleten-services.com/'
 ADDRESS_FROM = 'East 2nd Street, 601'
 ADDRESS_TO = '1300 1st St'
 PHONE_NUMBER = '+1 123 123 12 12'
