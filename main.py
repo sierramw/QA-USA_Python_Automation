@@ -4,7 +4,6 @@ from selenium.webdriver import DesiredCapabilities
 import data, helpers
 from pages import UrbanRoutes
 
-
 class TestUrbanRoutes:
     @classmethod
     def setup_class(cls):
@@ -14,10 +13,11 @@ class TestUrbanRoutes:
         cls.driver = webdriver.Chrome()
 
         # Step 2: Check URL reachability only
-        if helpers.is_url_reachable('https://cnt-ea585d14-6ded-4abe-b0aa-2c6ed5c9972c.containerhub.tripleten-services.com/'):
+        if helpers.is_url_reachable(data.URBAN_ROUTES_URL):
             print("Connected to the Urban Routes server")
         else:
-            print("Cannot connect to Urban Routes. Check the server is on and still running")
+            # Handle the case when the server is not reachable
+            print("Server is not reachable")
 
     # --- Test 1: Set addresses ---
     def test_set_route(self):
@@ -34,6 +34,10 @@ class TestUrbanRoutes:
         self.driver.get(data.URBAN_ROUTES_URL)
         routes_page = UrbanRoutes(self.driver)
 
+        # PREREQUISITES
+        routes_page.set_address(data.ADDRESS_FROM, data.ADDRESS_TO)
+        routes_page.call_taxi()
+
         routes_page.select_supportive_plan()
         assert "Supportive" in routes_page.get_selected_plan_text()
 
@@ -41,6 +45,10 @@ class TestUrbanRoutes:
     def test_fill_phone_number(self):
         self.driver.get(data.URBAN_ROUTES_URL)
         routes_page = UrbanRoutes(self.driver)
+
+        # PREREQUISITES
+        routes_page.set_address(data.ADDRESS_FROM, data.ADDRESS_TO)
+        routes_page.call_taxi()
 
         routes_page.enter_phone_and_confirm(data.PHONE_NUMBER, helpers.retrieve_phone_code)
         assert routes_page.get_entered_phone_number() == data.PHONE_NUMBER
@@ -50,6 +58,10 @@ class TestUrbanRoutes:
         self.driver.get(data.URBAN_ROUTES_URL)
         routes_page = UrbanRoutes(self.driver)
 
+        # PREREQUISITES
+        routes_page.set_address(data.ADDRESS_FROM, data.ADDRESS_TO)
+        routes_page.call_taxi()
+
         routes_page.open_payment_and_add_card(data.CARD_NUMBER, data.CARD_CODE)
         assert routes_page.get_payment_method_text() == "Card"
 
@@ -57,6 +69,10 @@ class TestUrbanRoutes:
     def test_comment_for_driver(self):
         self.driver.get(data.URBAN_ROUTES_URL)
         routes_page = UrbanRoutes(self.driver)
+
+        # PREREQUISITES
+        routes_page.set_address(data.ADDRESS_FROM, data.ADDRESS_TO)
+        routes_page.call_taxi()
 
         routes_page.add_comment(data.MESSAGE_FOR_DRIVER)
         assert routes_page.get_comment_text() == data.MESSAGE_FOR_DRIVER
@@ -66,6 +82,10 @@ class TestUrbanRoutes:
         self.driver.get(data.URBAN_ROUTES_URL)
         routes_page = UrbanRoutes(self.driver)
 
+        # PREREQUISITES
+        routes_page.set_address(data.ADDRESS_FROM, data.ADDRESS_TO)
+        routes_page.call_taxi()
+
         routes_page.toggle_blanket()
         assert routes_page.is_blanket_selected()
 
@@ -74,6 +94,10 @@ class TestUrbanRoutes:
         self.driver.get(data.URBAN_ROUTES_URL)
         routes_page = UrbanRoutes(self.driver)
 
+        # PREREQUISITES
+        routes_page.set_address(data.ADDRESS_FROM, data.ADDRESS_TO)
+        routes_page.call_taxi()
+
         count = routes_page.add_icecreams(count=2)
         assert count == 2
 
@@ -81,6 +105,10 @@ class TestUrbanRoutes:
     def test_car_search_modal_appears(self):
         self.driver.get(data.URBAN_ROUTES_URL)
         routes_page = UrbanRoutes(self.driver)
+
+        # PREREQUISITES
+        routes_page.set_address(data.ADDRESS_FROM, data.ADDRESS_TO)
+        routes_page.call_taxi()
 
         routes_page.place_order()
         assert routes_page.is_car_search_modal_displayed()

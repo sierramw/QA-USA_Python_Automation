@@ -7,7 +7,7 @@ class UrbanRoutes:
     # --- Address fields ---
     FROM_FIELD = (By.ID, "from")
     TO_FIELD = (By.ID, "to")
-    CALL_TAXI_BTN = (By.CLASS_NAME, "button")
+    CALL_TAXI_BTN = (By.ID, "call-taxi-button")
 
     # --- Tariff selection ---
     SUPPORTIVE_TARIFF = (By.XPATH, "//div[contains(text(),'Supportive')]")
@@ -54,6 +54,12 @@ class UrbanRoutes:
 
     def get_to_value(self):
         return self.driver.find_element(*self.TO_FIELD).get_attribute("value")
+
+    # --- Step 1.5: Call taxi ---
+    def call_taxi(self):
+            #Click the 'Call a taxi' button after addresses are set
+            button = self.wait.until(EC.element_to_be_clickable(self.CALL_TAXI_BTN))
+            button.click()
 
     # --- Step 2: Select tariff ---
     def select_supportive_plan(self):
@@ -111,16 +117,17 @@ class UrbanRoutes:
         self.wait.until(EC.element_to_be_clickable(self.BLANKET_CHECKBOX)).click()
 
     def is_blanket_selected(self):
-        return self.driver.find_element(*self.BLANKET_CHECKBOX).is_selected()
+        return self.driver.find_element(*self.BLANKET_CHECKBOX).get_property("checked")
 
-    # --- Step 7: Add ice creams ---
+     # --- Step 7: Add ice creams ---
     def add_icecreams(self, count=2):
-        button = self.wait.until(EC.element_to_be_clickable(self.ICECREAM_ADD_BTN))
-        for i in range(count):
-            button.click()
-        return count
+            number_of_ice_creams = 2
+            button = self.wait.until(EC.element_to_be_clickable(self.ICECREAM_ADD_BTN))
+            for i in range(number_of_ice_creams):
+                button.click()
+            return number_of_ice_creams
 
-    # --- Step 8: Place order ---
+   # --- Step 8: Place order ---
     def place_order(self):
         self.wait.until(EC.element_to_be_clickable(self.ORDER_BTN)).click()
 
