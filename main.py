@@ -12,6 +12,7 @@ class TestUrbanRoutes:
         capabilities["goog:loggingPrefs"] = {"performance": "ALL"}
         cls.driver = webdriver.Chrome()
 
+
         # Step 2: Check URL reachability only
         if helpers.is_url_reachable(data.URBAN_ROUTES_URL):
             print("Connected to the Urban Routes server")
