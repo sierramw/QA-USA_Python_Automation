@@ -2,39 +2,41 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+import helpers
+
 
 class UrbanRoutes:
     # --- Address fields ---
     FROM_FIELD = (By.ID, "from")
     TO_FIELD = (By.ID, "to")
-    CALL_TAXI_BTN = (By.ID, "call-taxi-button")
+    CALL_TAXI_BTN = (By.XPATH, "//button[text()='Call a taxi']")
 
     # --- Tariff selection ---
     SUPPORTIVE_TARIFF = (By.XPATH, "//div[contains(text(),'Supportive')]")
 
     # --- Phone number flow ---
-    PHONE_FIELD = (By.CSS_SELECTOR, "input#phone")
+    PHONE_FIELD = (By.ID, "phone")
     NEXT_BTN = (By.XPATH, "//button[text()='Next']")
     SMS_CODE_INPUT = (By.CSS_SELECTOR, "input#code")
     CONFIRM_PHONE_BTN = (By.XPATH, "//button[text()='Confirm']")
+    PHONE_NUMBER_BTN = (By.CLASS_NAME, "np-text")
 
     # --- Card payment flow ---
     PAYMENT_METHOD_BTN = (By.XPATH, "//div[contains(@class,'pp-button')]")
     ADD_CARD_BTN = (By.XPATH, "//div[contains(text(),'Add card')]")
     CARD_NUMBER_INPUT = (By.CSS_SELECTOR, "input#number")
-    CVV_INPUT = (By.CSS_SELECTOR, "input#code")
+    CVV_INPUT = (By.XPATH, "(//input[@id='code'])[2]")
     LINK_CARD_BTN = (By.XPATH, "//button[text()='Link']")
     CARD_CONFIRMATION = (By.XPATH, "//div[contains(text(),'Card')]")
 
     # --- Comment & extras ---
     COMMENT_FIELD = (By.ID, "comment")
-    BLANKET_CHECKBOX = (By.NAME, "blanket")
-    ICECREAM_ADD_BTN = (By.XPATH, "//button[contains(.,'Ice cream')]")
+    BLANKET_CHECKBOX = (By.XPATH,"//div[@class='r-sw-label' and normalize-space(text())='Blanket and handkerchiefs']/preceding::div[@class='r-sw'][1]//input[@type='checkbox']")
+    ICECREAM_ADD_BTN = (By.XPATH,"//div[@class='r-counter-label' and normalize-space(text())='Ice cream']/following-sibling::button[contains(@class, 'plus')]")
 
     # --- Final order ---
-    ORDER_BTN = (By.XPATH, "//button[text()='Call a Taxi']")
-    CAR_SEARCH_MODAL = (By.CLASS_NAME, "order-modal")
-
+    ORDER_BTN = (By.XPATH, "//button[normalize-space(text())='Call a taxi']")
+    CAR_SEARCH_MODAL = (By.XPATH, ".//div[contains(@class,'modal')][.//@class='head'and contains(.,'phone number')]]")
     def __init__(self, driver, timeout=10):
         self.driver = driver
         self.wait = WebDriverWait(driver, timeout)
@@ -70,19 +72,19 @@ class UrbanRoutes:
 
     # --- Step 3: Phone number flow ---
     def enter_phone_and_confirm(self, phone, code_callback):
-        field = self.wait.until(EC.element_to_be_clickable(self.PHONE_FIELD))
-        field.clear()
+        self.driver.find_element(*self.PHONE_NUMBER_BTN).click()
+        field = self.driver.find_element(*self.PHONE_FIELD)
         field.send_keys(phone)
         self.driver.find_element(*self.NEXT_BTN).click()
 
         # simulate retrieving code (via callback helper)
-        code = code_callback()
+        code = helpers.retrieve_phone_code(self.driver)
         sms_field = self.wait.until(EC.element_to_be_clickable(self.SMS_CODE_INPUT))
         sms_field.send_keys(code)
         self.driver.find_element(*self.CONFIRM_PHONE_BTN).click()
 
     def get_entered_phone_number(self):
-        return self.driver.find_element(*self.PHONE_FIELD).get_attribute("value")
+        return self.driver.find_element(*self.PHONE_NUMBER_BTN).text
 
     # --- Step 4: Card payment flow ---
     def open_payment_and_add_card(self, card_number, cvv):

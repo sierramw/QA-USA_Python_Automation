@@ -97,6 +97,7 @@ class TestUrbanRoutes:
         # PREREQUISITES
         routes_page.set_address(data.ADDRESS_FROM, data.ADDRESS_TO)
         routes_page.call_taxi()
+        routes_page.select_supportive_plan()
 
         count = routes_page.add_icecreams(count=2)
         assert count == 2
