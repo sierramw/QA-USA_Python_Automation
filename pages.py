@@ -122,11 +122,10 @@ class UrbanRoutes:
 
      # --- Step 7: Add ice creams ---
     def add_icecreams(self, count=2):
-            number_of_ice_creams = 2
-            button = self.wait.until(EC.element_to_be_clickable(self.ICECREAM_ADD_BTN))
-            for i in range(number_of_ice_creams):
-                button.click()
-            return number_of_ice_creams
+        button = self.wait.until(EC.element_to_be_clickable(self.ICECREAM_ADD_BTN))
+        for i in range(count):
+            button.click()
+        return count
 
    # --- Step 8: Place order ---
     def place_order(self):

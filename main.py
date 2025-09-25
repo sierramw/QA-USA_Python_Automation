@@ -40,7 +40,7 @@ class TestUrbanRoutes:
         routes_page.call_taxi()
 
         routes_page.select_supportive_plan()
-        assert "Supportive" in routes_page.get_selected_plan_text()
+        assert routes_page.get_selected_plan_text() == "Supportive"
 
     # --- Test 3: Phone number + SMS verification ---
     def test_fill_phone_number(self):
