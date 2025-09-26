@@ -21,7 +21,7 @@ class UrbanRoutes:
     PHONE_NUMBER_BTN = (By.CLASS_NAME, "np-text")
 
     # --- Card payment flow ---
-    PAYMENT_METHOD_BTN = (By.XPATH, "//div[contains(@class,'pp-button')]")
+    PAYMENT_METHOD_BTN = (By.XPATH, '//div[@class="pp-button filled"]')
     ADD_CARD_BTN = (By.XPATH, "//div[contains(text(),'Add card')]")
     CARD_NUMBER_INPUT = (By.CSS_SELECTOR, "input#number")
     CVV_INPUT = (By.XPATH, "(//input[@id='code'])[2]")
@@ -30,12 +30,13 @@ class UrbanRoutes:
 
     # --- Comment & extras ---
     COMMENT_FIELD = (By.ID, "comment")
-    BLANKET_CHECKBOX = (By.XPATH,"//div[@class='r-sw-label' and normalize-space(text())='Blanket and handkerchiefs']/preceding::div[@class='r-sw'][1]//input[@type='checkbox']")
-    ICECREAM_ADD_BTN = (By.XPATH,"//div[@class='r-counter-label' and normalize-space(text())='Ice cream']/following-sibling::button[contains(@class, 'plus')]")
+    BLANKET_CHECKBOX = (By.XPATH,"//input[@type='checkbox']")
+    ICECREAM_ADD_BTN = (By.XPATH, '//div[text()="+"]')
+    ICECREAM_ADD_QTY = (By.XPATH, "//div[@class='counter-value']")
 
     # --- Final order ---
-    ORDER_BTN = (By.XPATH, "//button[normalize-space(text())='Call a taxi']")
-    CAR_SEARCH_MODAL = (By.XPATH, ".//div[contains(@class,'modal')][.//@class='head'and contains(.,'phone number')]]")
+    ORDER_BTN = (By.XPATH, '//span[@class="smart-button-main"]')
+    CAR_SEARCH_MODAL = (By.XPATH, '//div[@class="order-header-title"]')
     def __init__(self, driver, timeout=10):
         self.driver = driver
         self.wait = WebDriverWait(driver, timeout)
@@ -97,7 +98,8 @@ class UrbanRoutes:
         cvv_field = self.wait.until(EC.element_to_be_clickable(self.CVV_INPUT))
         cvv_field.clear()
         cvv_field.send_keys(cvv)
-
+        from selenium.webdriver.common.keys import Keys
+        cvv_field.send_keys(Keys.TAB)
         self.wait.until(EC.element_to_be_clickable(self.LINK_CARD_BTN)).click()
         self.wait.until(EC.presence_of_element_located(self.CARD_CONFIRMATION))
 
@@ -113,9 +115,10 @@ class UrbanRoutes:
     def get_comment_text(self):
         return self.driver.find_element(*self.COMMENT_FIELD).get_attribute("value")
 
+    BLANKET_TOGGLE = (By.CSS_SELECTOR, ".slider.round")
     # --- Step 6: Toggle blanket ---
     def toggle_blanket(self):
-        self.wait.until(EC.element_to_be_clickable(self.BLANKET_CHECKBOX)).click()
+        self.wait.until(EC.element_to_be_clickable(self.BLANKET_TOGGLE)).click()
 
     def is_blanket_selected(self):
         return self.driver.find_element(*self.BLANKET_CHECKBOX).get_property("checked")
@@ -125,7 +128,7 @@ class UrbanRoutes:
         button = self.wait.until(EC.element_to_be_clickable(self.ICECREAM_ADD_BTN))
         for i in range(count):
             button.click()
-        return count
+        return self.wait.until(EC.element_to_be_clickable(self.ICECREAM_ADD_QTY)).text
 
    # --- Step 8: Place order ---
     def place_order(self):

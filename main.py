@@ -101,7 +101,7 @@ class TestUrbanRoutes:
         routes_page.select_supportive_plan()
 
         count = routes_page.add_icecreams(count=2)
-        assert count == 2
+        assert count == '2'
 
     # --- Test 8: Car search modal ---
     def test_car_search_modal_appears(self):
@@ -111,6 +111,7 @@ class TestUrbanRoutes:
         # PREREQUISITES
         routes_page.set_address(data.ADDRESS_FROM, data.ADDRESS_TO)
         routes_page.call_taxi()
+        routes_page.add_comment(data.MESSAGE_FOR_DRIVER)
 
         routes_page.place_order()
         assert routes_page.is_car_search_modal_displayed()
