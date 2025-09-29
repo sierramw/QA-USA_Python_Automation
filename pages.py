@@ -14,15 +14,16 @@ class UrbanRoutes:
     SUPPORTIVE_TARIFF = (By.XPATH, "//div[contains(text(),'Supportive')]")
 
     # --- Phone number flow ---
-    PHONE_FIELD = (By.ID, "phone")
+    PHONE_FIELD = (By.XPATH, '//div[text()="Phone number"]')
     NEXT_BTN = (By.XPATH, "//button[text()='Next']")
     SMS_CODE_INPUT = (By.CSS_SELECTOR, "input#code")
     CONFIRM_PHONE_BTN = (By.XPATH, "//button[text()='Confirm']")
     PHONE_NUMBER_BTN = (By.CLASS_NAME, "np-text")
+    ENTER_PHONE_FIELD = (By.ID, 'phone')
 
     # --- Card payment flow ---
     PAYMENT_METHOD_BTN = (By.XPATH, '//div[@class="pp-button filled"]')
-    ADD_CARD_BTN = (By.XPATH, "//div[contains(text(),'Add card')]")
+    ADD_CARD_BTN = (By.XPATH, "//div[text()='Add card']")
     CARD_NUMBER_INPUT = (By.CSS_SELECTOR, "input#number")
     CVV_INPUT = (By.XPATH, "(//input[@id='code'])[2]")
     LINK_CARD_BTN = (By.XPATH, "//button[text()='Link']")
@@ -30,7 +31,8 @@ class UrbanRoutes:
 
     # --- Comment & extras ---
     COMMENT_FIELD = (By.ID, "comment")
-    BLANKET_CHECKBOX = (By.XPATH,"//input[@type='checkbox']")
+    BLANKET_CHECKBOX = (By.XPATH, "//input[@class='switch-input']")
+    BLANKET_TOGGLE = (By.XPATH, "//div[@class='switch']")
     ICECREAM_ADD_BTN = (By.XPATH, '//div[text()="+"]')
     ICECREAM_ADD_QTY = (By.XPATH, "//div[@class='counter-value']")
 
@@ -72,9 +74,13 @@ class UrbanRoutes:
 
     # --- Step 3: Phone number flow ---
     def enter_phone_and_confirm(self, phone, code_callback):
-        self.driver.find_element(*self.PHONE_NUMBER_BTN).click()
-        field = self.driver.find_element(*self.PHONE_FIELD)
+        # Click the "Phone number" div button
+        self.driver.find_element(*self.PHONE_FIELD).click()
+
+        # Enter phone number in the input field
+        field = self.driver.find_element(*self.ENTER_PHONE_FIELD)
         field.send_keys(phone)
+
         self.driver.find_element(*self.NEXT_BTN).click()
 
         # simulate retrieving code (via callback helper)
@@ -89,6 +95,11 @@ class UrbanRoutes:
     # --- Step 4: Card payment flow ---
     def open_payment_and_add_card(self, card_number, cvv):
         self.wait.until(EC.element_to_be_clickable(self.PAYMENT_METHOD_BTN)).click()
+        # Debug: Print all elements that contain "Add card"
+        elements = self.driver.find_elements(By.XPATH, "//*[contains(text(),'Add card')]")
+        print(f"Found {len(elements)} elements with 'Add card' text")
+        for elem in elements:
+            print(f"Tag: {elem.tag_name}, Text: {elem.text}")
         self.wait.until(EC.element_to_be_clickable(self.ADD_CARD_BTN)).click()
 
         card_field = self.wait.until(EC.element_to_be_clickable(self.CARD_NUMBER_INPUT))
@@ -118,6 +129,11 @@ class UrbanRoutes:
     BLANKET_TOGGLE = (By.CSS_SELECTOR, ".slider.round")
     # --- Step 6: Toggle blanket ---
     def toggle_blanket(self):
+        # Debug: Look for blanket-related elements
+        elements = self.driver.find_elements(By.XPATH, "//*[contains(@id,'blanket') or contains(text(),'Blanket')]")
+        print(f"Found {len(elements)} blanket-related elements")
+        for elem in elements:
+            print(f"Tag: {elem.tag_name}, ID: {elem.get_attribute('id')}, Text: {elem.text}")
         self.wait.until(EC.element_to_be_clickable(self.BLANKET_TOGGLE)).click()
 
     def is_blanket_selected(self):
